@@ -18,15 +18,16 @@ STATE: Dict[str, Any] = {
 }
 
 
-def _project(matrix: np.ndarray, projection: str, seed: int) -> np.ndarray:
+def _project(matrix: np.ndarray, projection: str, seed: int) -> tuple:
     if projection.lower() == "umap":
         try:
             import umap  # type: ignore
-
-            return umap.UMAP(n_components=2, random_state=seed).fit_transform(matrix)
-        except Exception:
-            pass
-    return PCA(n_components=2, random_state=seed).fit_transform(matrix)
+            return umap.UMAP(n_components=2, random_state=seed).fit_transform(matrix), None
+        except ImportError:
+            return PCA(n_components=2, random_state=seed).fit_transform(matrix), "umap-learn is not installed; fell back to PCA."
+        except Exception as exc:
+            return PCA(n_components=2, random_state=seed).fit_transform(matrix), f"UMAP failed ({exc}); fell back to PCA."
+    return PCA(n_components=2, random_state=seed).fit_transform(matrix), None
 
 
 def _composition(group: pd.DataFrame, column: str) -> Dict[str, int]:
@@ -87,7 +88,7 @@ def process_dataframe(df: pd.DataFrame, projection: str, num_clusters: int, seed
     scaler = StandardScaler()
     numeric = work[FEATURE_NAMES].replace([np.inf, -np.inf], 0).fillna(0)
     standardized = scaler.fit_transform(numeric)
-    projection_xy = _project(standardized, projection, seed)
+    projection_xy, projection_warning = _project(standardized, projection, seed)
 
     clusters = KMeans(n_clusters=min(num_clusters, len(work)), n_init=10, random_state=seed).fit_predict(standardized)
     work["projection_x"] = projection_xy[:, 0]
@@ -113,6 +114,7 @@ def process_dataframe(df: pd.DataFrame, projection: str, num_clusters: int, seed
     STATE["standardized"] = standardized
     STATE["neighbors"] = NearestNeighbors(n_neighbors=min(50, len(work)), metric="euclidean").fit(standardized)
 
+    actual_projection = projection if projection_warning is None else "pca"
     summary = {
         "total_samples": int(len(work)),
         "human_samples": int((work["label"] == "human").sum()),
@@ -120,7 +122,7 @@ def process_dataframe(df: pd.DataFrame, projection: str, num_clusters: int, seed
         "num_models": int(work["model"].nunique()),
         "num_domains": int(work["domain"].nunique()),
         "num_clusters": int(work["cluster"].nunique()),
-        "projection": projection,
+        "projection": actual_projection,
     }
     return {
         "points": points.replace({np.nan: None}).to_dict(orient="records"),
@@ -129,6 +131,7 @@ def process_dataframe(df: pd.DataFrame, projection: str, num_clusters: int, seed
         "feature_profiles": feature_profiles,
         "model_summary": model_summary,
         "feature_names": FEATURE_NAMES,
+        "warnings": [projection_warning] if projection_warning else [],
         "_state_records": work.replace({np.nan: None}).to_dict(orient="records"),
         "_standardized": standardized.tolist(),
     }

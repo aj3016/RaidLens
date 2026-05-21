@@ -4,7 +4,7 @@ import Plot from 'react-plotly.js'
 export default function FeatureProfileHeatmap({ profiles, features, onFeatureClick }) {
   const columns = features.slice(0, 12)
   return (
-    <section className="panel">
+    <section className="panel heatmap-panel">
       <div className="panel-title">
         <h2>Feature Profile Heatmap</h2>
         <span>Cluster z-means</span>
