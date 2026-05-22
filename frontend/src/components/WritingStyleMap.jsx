@@ -3,7 +3,7 @@ import Plot from 'react-plotly.js'
 
 const palette = ['#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e', '#17becf', '#8c564b', '#7f7f7f', '#bcbd22']
 
-export default function WritingStyleMap({ points, colorBy, selectedCluster, selectedPoint, onPointClick }) {
+export default function WritingStyleMap({ points, colorBy, selectedCluster, selectedPoint, projection, onPointClick }) {
   const groups = [...new Set(points.map((p) => String(p[colorBy] ?? 'unknown')))]
   const traces = groups.map((group, index) => {
     const rows = points.filter((p) => String(p[colorBy] ?? 'unknown') === group)
@@ -29,7 +29,7 @@ export default function WritingStyleMap({ points, colorBy, selectedCluster, sele
     <section className="panel map-panel">
       <div className="panel-title">
         <h2>Writing Style Map</h2>
-        <span>{points.length} samples</span>
+        <span>{projection ? projection.toUpperCase() : ''} &middot; {points.length} samples</span>
       </div>
       <Plot
         data={traces}

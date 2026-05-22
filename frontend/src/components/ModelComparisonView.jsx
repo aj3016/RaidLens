@@ -15,7 +15,7 @@ const comparisonFeatures = [
 export default function ModelComparisonView({ modelSummary, onModelClick }) {
   const models = modelSummary.slice(0, 8)
   return (
-    <section className="panel wide-panel">
+    <section className="panel">
       <div className="panel-title">
         <h2>Model Comparison</h2>
         <span>Average normalized feature profiles</span>
