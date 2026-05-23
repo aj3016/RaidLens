@@ -10,7 +10,7 @@ export default function FeatureDistributionView({ points, feature, setFeature, f
     boxpoints: 'outliers',
   }))
   return (
-    <section className="panel wide-panel">
+    <section className="panel">
       <div className="panel-title">
         <h2>Feature Distribution</h2>
         <select value={feature} onChange={(e) => setFeature(e.target.value)}>

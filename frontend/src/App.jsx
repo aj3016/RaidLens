@@ -12,8 +12,8 @@ import OverlapExplorer from './components/OverlapExplorer'
 
 export const defaultFilters = {
   max_rows: 5000,
-  models: [],
-  domains: [],
+  models: ['human', 'mpt', 'llama-chat', 'gpt2', 'mistral-chat'],
+  domains: ['poetry', 'wiki', 'books', 'news'],
   attacks: ['none'],
   random_seed: 42,
   projection: 'pca',
@@ -137,6 +137,26 @@ export default function App() {
               <option value="attack">Attack</option>
             </select>
           </div>
+          <div className="results-filter-pills">
+            {filters.models.length > 0 && (
+              <div className="results-filter-group">
+                <span className="results-filter-label">Models</span>
+                {filters.models.map((m) => <span key={m} className="results-filter-pill">{m}</span>)}
+              </div>
+            )}
+            {filters.domains.length > 0 && (
+              <div className="results-filter-group">
+                <span className="results-filter-label">Domains</span>
+                {filters.domains.map((d) => <span key={d} className="results-filter-pill">{d}</span>)}
+              </div>
+            )}
+            {filters.attacks.length > 0 && (
+              <div className="results-filter-group">
+                <span className="results-filter-label">Attacks</span>
+                {filters.attacks.map((a) => <span key={a} className="results-filter-pill">{a}</span>)}
+              </div>
+            )}
+          </div>
           {warnings.length > 0 && (
             <div className="results-warnings">
               {warnings.map((w) => <span key={w} className="filter-note">{w}</span>)}
@@ -175,7 +195,6 @@ export default function App() {
             features={featureNames}
             onFeatureClick={setSelectedFeature}
           />
-          <ModelComparisonView modelSummary={modelSummary} onModelClick={handleModelClick} />
           <FeatureDistributionView
             points={points}
             feature={selectedFeature}
@@ -183,6 +202,7 @@ export default function App() {
             featureNames={featureNames}
             groupBy={colorBy}
           />
+          <ModelComparisonView modelSummary={modelSummary} onModelClick={handleModelClick} />
         </div>
       </main>
     </div>
