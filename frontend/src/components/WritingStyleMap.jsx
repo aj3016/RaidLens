@@ -1,9 +1,20 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Plot from 'react-plotly.js'
 
 const palette = ['#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e', '#17becf', '#8c564b', '#7f7f7f', '#bcbd22']
 
 export default function WritingStyleMap({ points, colorBy, selectedCluster, selectedPoint, projection, onPointClick }) {
+  const [revision, setRevision] = useState(0)
+  const initialized = useRef(false)
+
+  useEffect(() => {
+    if (points.length > 0 && !initialized.current) {
+      initialized.current = true
+      // Force Plotly.react() after initial newPlot() to properly bind click handlers
+      setRevision(1)
+    }
+  }, [points.length])
+
   const groups = [...new Set(points.map((p) => String(p[colorBy] ?? 'unknown')))]
   const traces = groups.map((group, index) => {
     const rows = points.filter((p) => String(p[colorBy] ?? 'unknown') === group)
@@ -33,16 +44,18 @@ export default function WritingStyleMap({ points, colorBy, selectedCluster, sele
       </div>
       <Plot
         data={traces}
+        revision={revision}
         layout={{
           autosize: true,
           margin: { l: 42, r: 18, t: 10, b: 42 },
+          dragmode: 'pan',
           xaxis: { title: 'Projection X', zeroline: false },
           yaxis: { title: 'Projection Y', zeroline: false },
           legend: { orientation: 'h', y: -0.2 },
           paper_bgcolor: 'white',
           plot_bgcolor: 'white',
         }}
-        config={{ responsive: true, displayModeBar: true }}
+        config={{ responsive: true, displayModeBar: true, displaylogo: false }}
         useResizeHandler
         className="plot"
         onClick={(event) => {

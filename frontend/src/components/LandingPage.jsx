@@ -20,7 +20,10 @@ function MultiCheckList({ label, value, options, onChange }) {
       <button type="button" className="mcl-trigger" onClick={() => setOpen((o) => !o)}>
         <div className="mcl-trigger-left">
           <span className="mcl-label">{label}</span>
-          {value.length > 0 && <span className="mcl-count">{value.length}</span>}
+          {value.length > 0
+            ? <span className="mcl-count">{value.length}</span>
+            : <span className="mcl-count mcl-count-all">{options.length}</span>
+          }
         </div>
         <span className="mcl-chevron" aria-hidden="true">▾</span>
       </button>
@@ -32,7 +35,10 @@ function MultiCheckList({ label, value, options, onChange }) {
             </button>
           </div>
           <div className="mcl-list">
-            {options.map((opt) => (
+            {[...options].sort((a, b) => {
+              const aOn = value.includes(a), bOn = value.includes(b)
+              return aOn === bOn ? 0 : aOn ? -1 : 1
+            }).map((opt) => (
               <label key={opt} className={`mcl-item${value.includes(opt) ? ' active' : ''}`}>
                 <input type="checkbox" checked={value.includes(opt)} onChange={() => toggle(opt)} />
                 <span>{opt}</span>

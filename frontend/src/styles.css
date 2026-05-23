@@ -641,10 +641,12 @@ button:disabled {
 }
 
 .landing-accent {
+  display: inline-block;
   background: linear-gradient(135deg, #15a880 0%, #5ef5c8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  padding-right: 6px;
 }
 
 .landing-sub {
@@ -795,6 +797,11 @@ button:disabled {
   padding: 1px 6px;
   border-radius: var(--r-pill);
   line-height: 1.4;
+}
+
+.mcl-count-all {
+  background: rgba(255,255,255,.10);
+  color: rgba(255,255,255,.45);
 }
 
 .mcl-chevron {
@@ -953,11 +960,48 @@ button:disabled {
   box-shadow: 0 0 0 2px rgba(21,168,128,.12);
 }
 
+.results-filter-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.results-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.results-filter-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.results-filter-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
 .results-warnings {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* ─── Header Back Button ────────────────────────────────────────────────── */
