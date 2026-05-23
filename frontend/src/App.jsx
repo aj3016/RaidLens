@@ -134,6 +134,7 @@ export default function App() {
               <option value="model">Model</option>
               <option value="domain">Domain</option>
               <option value="cluster">Cluster</option>
+              <option value="cluster_composition">Cluster composition</option>
               <option value="attack">Attack</option>
             </select>
           </div>

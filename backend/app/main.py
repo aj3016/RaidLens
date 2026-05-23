@@ -12,6 +12,7 @@ app = FastAPI(title="RAIDLens API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"^http://(localhost|127\.0\.0\.1):517[0-9]$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,6 +48,7 @@ def metadata():
 @app.post("/api/process", response_model=ProcessResponse)
 def process(req: ProcessRequest):
     params = req.model_dump()
+    params["sampling_version"] = 3
     cached = load_json_cache("process", params)
     if cached:
         hydrate_state(cached)

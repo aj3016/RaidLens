@@ -437,6 +437,41 @@ button:disabled {
   white-space: nowrap;
 }
 
+.panel-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title-actions span {
+  color: var(--text-3);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.mini-toggle {
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  box-shadow: none;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.mini-toggle:hover:not(:disabled),
+.mini-toggle.active {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent-dim);
+  box-shadow: none;
+  transform: none;
+}
+
 .panel-title select {
   border: 1.5px solid var(--border);
   border-radius: var(--r-sm);

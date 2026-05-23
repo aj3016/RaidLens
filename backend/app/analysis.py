@@ -34,6 +34,18 @@ def _composition(group: pd.DataFrame, column: str) -> Dict[str, int]:
     return group[column].astype(str).value_counts().to_dict()
 
 
+def _cluster_composition_label(human_pct: float) -> str:
+    if human_pct == 0:
+        return "AI"
+    if human_pct == 1:
+        return "Human"
+    if human_pct < 0.35:
+        return "Mostly AI"
+    if human_pct <= 0.65:
+        return "Mixed"
+    return "Mostly Human"
+
+
 def _cluster_summary(df: pd.DataFrame) -> List[Dict[str, Any]]:
     rows = []
     for cluster, group in df.groupby("cluster"):
@@ -51,6 +63,7 @@ def _cluster_summary(df: pd.DataFrame) -> List[Dict[str, Any]]:
                 "human_pct": human_pct,
                 "ai_pct": ai_pct,
                 "mixedness": 1 - abs(human_pct - ai_pct),
+                "composition_label": _cluster_composition_label(human_pct),
                 "model_composition": _composition(group, "model"),
                 "domain_composition": _composition(group, "domain"),
             }
@@ -99,13 +112,15 @@ def process_dataframe(df: pd.DataFrame, projection: str, num_clusters: int, seed
 
     z_feature_cols = [f"z_{f}" for f in FEATURE_NAMES]
     cluster_summary = _cluster_summary(work)
+    cluster_labels = {row["cluster"]: row["composition_label"] for row in cluster_summary}
+    work["cluster_composition"] = work["cluster"].map(cluster_labels)
     feature_profiles = _feature_profiles(work, z_feature_cols)
     model_summary = _model_summary(work, FEATURE_NAMES, z_feature_cols)
 
     point_cols = [
         "sample_id", "label", "model", "domain", "attack", "decoding",
         "repetition_penalty", "title", "prompt", "projection_x", "projection_y",
-        "cluster", *FEATURE_NAMES,
+        "cluster", "cluster_composition", *FEATURE_NAMES,
     ]
     points = work[point_cols].copy()
     points["excerpt"] = work["generation"].fillna("").astype(str).str.slice(0, 260)
@@ -184,6 +199,7 @@ def get_neighbors(sample_id: str, k: int = 8) -> List[Dict[str, Any]]:
                 "domain": row["domain"],
                 "attack": row["attack"],
                 "cluster": int(row["cluster"]),
+                "cluster_composition": row.get("cluster_composition", "unknown"),
                 "word_count": float(row["word_count"]),
                 "excerpt": str(row["generation"])[:220],
             }

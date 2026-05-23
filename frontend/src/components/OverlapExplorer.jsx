@@ -15,7 +15,7 @@ export default function OverlapExplorer({ clusters, selectedCluster, onClusterCl
             className={selectedCluster === cluster.cluster ? 'active' : ''}
             onClick={() => onClusterClick(cluster.cluster)}
           >
-            <strong>Cluster {cluster.cluster}</strong>
+            <strong>Cluster {cluster.cluster} · {cluster.composition_label}</strong>
             <span>mixedness {cluster.mixedness.toFixed(2)}</span>
             <span>{cluster.human_count} human · {cluster.ai_count} AI</span>
           </button>

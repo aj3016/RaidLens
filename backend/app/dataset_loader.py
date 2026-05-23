@@ -1,4 +1,5 @@
 from functools import lru_cache
+import math
 from typing import Dict, List, Tuple
 
 import pandas as pd
@@ -90,6 +91,43 @@ def _balanced_subset(df: pd.DataFrame, requested_models: List[str], requested_do
     return df, warnings
 
 
+def _sample_with_human_floor(df: pd.DataFrame, max_rows: int, seed: int) -> Tuple[pd.DataFrame, str]:
+    human_df = df[df["label"] == "human"]
+    ai_df = df[df["label"] == "AI"]
+
+    if ai_df.empty:
+        human_target = min(len(human_df), max(max_rows, 100))
+        sampled = human_df.sample(n=human_target, random_state=seed) if len(human_df) > human_target else human_df
+        return sampled, f"Balanced sampling applied: {len(sampled)} human and 0 AI samples."
+
+    if human_df.empty:
+        ai_target = min(len(ai_df), max_rows)
+        sampled = ai_df.sample(n=ai_target, random_state=seed) if len(ai_df) > ai_target else ai_df
+        return sampled, "Balanced sampling could not include human samples because none matched the active filters."
+
+    ai_target = min(len(ai_df), math.floor(max_rows * 2 / 3))
+    ai_target = min(ai_target, len(human_df) * 2)
+    human_target = min(len(human_df), max_rows - ai_target)
+    required_human = math.ceil(ai_target * 0.5)
+
+    if human_target < required_human:
+        ai_target = min(ai_target, human_target * 2)
+        required_human = math.ceil(ai_target * 0.5)
+    human_target = min(len(human_df), max(required_human, human_target))
+
+    sampled_ai = ai_df.sample(n=ai_target, random_state=seed) if len(ai_df) > ai_target else ai_df
+    sampled_human = (
+        human_df.sample(n=human_target, random_state=seed + 1)
+        if len(human_df) > human_target
+        else human_df
+    )
+    sampled = pd.concat([sampled_human, sampled_ai], ignore_index=True)
+    if len(sampled) > max_rows:
+        sampled = sampled.sample(n=max_rows, random_state=seed)
+    sampled = sampled.sample(frac=1, random_state=seed).reset_index(drop=True)
+    return sampled, f"Balanced sampling applied: {len(sampled_human)} human and {len(sampled_ai)} AI samples."
+
+
 def load_filtered_rows(
     max_rows: int,
     models: List[str],
@@ -126,8 +164,8 @@ def load_filtered_rows(
     if df.empty:
         raise ValueError("No rows matched the selected filters. Try broader model, domain, or attack settings.")
 
-    if len(df) > max_rows:
-        df = df.sample(n=max_rows, random_state=seed)
+    df, sampling_warning = _sample_with_human_floor(df, max_rows, seed)
+    warnings.append(sampling_warning)
     df = df.reset_index(drop=True)
     df["sample_id"] = [f"s{seed}_{i}" for i in range(len(df))]
     return df, warnings
