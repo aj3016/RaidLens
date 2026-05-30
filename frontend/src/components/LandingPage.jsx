@@ -1,52 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
-function MultiCheckList({ label, value, options, onChange }) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-
-  useEffect(() => {
-    if (!open) return
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
-
+function PillGroup({ label, value, options, onChange }) {
+  const allSelected = options.length > 0 && options.every((o) => value.includes(o))
   const toggle = (opt) =>
     onChange(value.includes(opt) ? value.filter((v) => v !== opt) : [...value, opt])
-  const allSelected = options.length > 0 && options.every((o) => value.includes(o))
 
   return (
-    <div className={`mcl${open ? ' mcl-open' : ''}`} ref={ref}>
-      <button type="button" className="mcl-trigger" onClick={() => setOpen((o) => !o)}>
-        <div className="mcl-trigger-left">
-          <span className="mcl-label">{label}</span>
-          {value.length > 0
-            ? <span className="mcl-count">{value.length}</span>
-            : <span className="mcl-count mcl-count-all">{options.length}</span>
-          }
-        </div>
-        <span className="mcl-chevron" aria-hidden="true">▾</span>
-      </button>
-      {open && (
-        <div className="mcl-dropdown">
-          <div className="mcl-dropdown-header">
-            <button type="button" className="mcl-toggle-all" onClick={() => onChange(allSelected ? [] : options)}>
-              {allSelected ? 'clear' : 'all'}
-            </button>
-          </div>
-          <div className="mcl-list">
-            {[...options].sort((a, b) => {
-              const aOn = value.includes(a), bOn = value.includes(b)
-              return aOn === bOn ? 0 : aOn ? -1 : 1
-            }).map((opt) => (
-              <label key={opt} className={`mcl-item${value.includes(opt) ? ' active' : ''}`}>
-                <input type="checkbox" checked={value.includes(opt)} onChange={() => toggle(opt)} />
-                <span>{opt}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-      )}
+    <div className="pill-group">
+      <div className="pill-group-header">
+        <span className="pill-group-label">{label}</span>
+        <span className="pill-group-count">{value.length > 0 ? `${value.length} selected` : 'all'}</span>
+        <button
+          type="button"
+          className="pill-group-action"
+          onClick={() => onChange(allSelected ? [] : [...options])}
+        >
+          {allSelected ? 'clear' : 'all'}
+        </button>
+      </div>
+      <div className="pill-group-pills">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            type="button"
+            className={`pill-g${value.includes(opt) ? ' pill-g-active' : ''}`}
+            onClick={() => toggle(opt)}
+          >
+            {opt}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
@@ -115,10 +98,25 @@ export default function LandingPage({ metadata, initialFilters, initialColorBy =
             </label>
           </div>
 
-          <div className="landing-mcl-grid">
-            <MultiCheckList label="Models"  value={filters.models}  options={metadata.models  || []}                                   onChange={(v) => set('models', v)} />
-            <MultiCheckList label="Domains" value={filters.domains} options={metadata.domains || []}                                   onChange={(v) => set('domains', v)} />
-            <MultiCheckList label="Attacks" value={filters.attacks} options={metadata.attacks?.length ? metadata.attacks : ['none']}  onChange={(v) => set('attacks', v)} />
+          <div className="landing-pill-groups">
+            <PillGroup
+              label="Models"
+              value={filters.models}
+              options={metadata.models || []}
+              onChange={(v) => set('models', v)}
+            />
+            <PillGroup
+              label="Domains"
+              value={filters.domains}
+              options={metadata.domains || []}
+              onChange={(v) => set('domains', v)}
+            />
+            <PillGroup
+              label="Attacks"
+              value={filters.attacks}
+              options={metadata.attacks?.length ? metadata.attacks : ['none']}
+              onChange={(v) => set('attacks', v)}
+            />
           </div>
 
           {error && <div className="notice error" style={{ marginBottom: 12 }}>{error}</div>}
