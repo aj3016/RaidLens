@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import Plot from 'react-plotly.js'
+import InfoTip from './InfoTip'
 
 const compositionOrder = ['AI', 'Mostly AI', 'Mixed', 'Mostly Human', 'Human']
 
@@ -24,7 +25,7 @@ export default function ClusterCompositionChart({ clusters, selectedCluster, onC
   return (
     <section className="panel">
       <div className="panel-title">
-        <h2>Cluster Composition</h2>
+        <h2>Cluster Composition <InfoTip text="Human vs AI sample count per cluster. Clusters are computed in the full 19-feature space, not on the 2D map. Toggle '5-way' to group clusters by composition label." /></h2>
         <div className="panel-title-actions">
           <button
             className={compositionView ? 'mini-toggle active' : 'mini-toggle'}

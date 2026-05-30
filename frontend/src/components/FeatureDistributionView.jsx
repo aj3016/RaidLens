@@ -1,5 +1,6 @@
 import React from 'react'
 import Plot from 'react-plotly.js'
+import InfoTip from './InfoTip'
 
 export default function FeatureDistributionView({ points, feature, setFeature, featureNames, groupBy }) {
   const groups = [...new Set(points.map((p) => String(p[groupBy] ?? 'unknown')))]
@@ -12,7 +13,7 @@ export default function FeatureDistributionView({ points, feature, setFeature, f
   return (
     <section className="panel">
       <div className="panel-title">
-        <h2>Feature Distribution</h2>
+        <h2>Feature Distribution <InfoTip text="Box plots of one writing feature grouped by the selected Color by dimension. Select a feature from the dropdown or click a cell in the heatmap." /></h2>
         <select value={feature} onChange={(e) => setFeature(e.target.value)}>
           {featureNames.map((name) => <option key={name} value={name}>{name}</option>)}
         </select>

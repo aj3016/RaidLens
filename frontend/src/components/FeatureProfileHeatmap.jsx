@@ -1,12 +1,13 @@
 import React from 'react'
 import Plot from 'react-plotly.js'
+import InfoTip from './InfoTip'
 
 export default function FeatureProfileHeatmap({ profiles, features, onFeatureClick }) {
   const columns = features.slice(0, 12)
   return (
     <section className="panel heatmap-panel">
       <div className="panel-title">
-        <h2>Feature Profile Heatmap</h2>
+        <h2>Feature Profile Heatmap <InfoTip text="Average z-score per cluster for each writing feature. Red = above average, blue = below average. Click any cell to update the Feature Distribution view below." /></h2>
         <span>Cluster z-means</span>
       </div>
       <Plot

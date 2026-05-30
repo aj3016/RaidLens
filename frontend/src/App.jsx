@@ -76,6 +76,12 @@ export default function App() {
     if (ok) setView('results')
   }
 
+  const handleReproject = async (newProjection) => {
+    const newFilters = { ...filters, projection: newProjection }
+    setFilters(newFilters)
+    await runProcess(newFilters)
+  }
+
   const selectPoint = async (sampleId) => {
     setDetailLoading(true)
     setError('')
@@ -136,6 +142,14 @@ export default function App() {
               <option value="cluster">Cluster</option>
               <option value="cluster_composition">Cluster composition</option>
               <option value="attack">Attack</option>
+            </select>
+          </div>
+          <div className="results-toolbar-sep" />
+          <div className="results-colorby">
+            <span>Projection</span>
+            <select value={filters.projection} onChange={(e) => handleReproject(e.target.value)} disabled={loading}>
+              <option value="pca">PCA</option>
+              <option value="umap">UMAP</option>
             </select>
           </div>
           <div className="results-filter-pills">
