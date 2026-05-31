@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Plot from 'react-plotly.js'
+import InfoTip from './InfoTip'
 
 const palette = ['#1f77b4', '#d62728', '#2ca02c', '#9467bd', '#ff7f0e', '#17becf', '#8c564b', '#7f7f7f', '#bcbd22']
 
@@ -39,7 +40,7 @@ export default function WritingStyleMap({ points, colorBy, selectedCluster, sele
   return (
     <section className="panel map-panel">
       <div className="panel-title">
-        <h2>Writing Style Map</h2>
+        <h2>Writing Style Map <InfoTip text="Each dot is one text sample positioned by writing style similarity. Nearby dots share similar feature patterns. Click any dot to inspect its text, features, and nearest neighbors." /></h2>
         <span>{projection ? projection.toUpperCase() : ''} &middot; {points.length} samples</span>
       </div>
       <Plot

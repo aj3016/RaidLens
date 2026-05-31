@@ -1,4 +1,5 @@
 import React from 'react'
+import InfoTip from './InfoTip'
 
 const visibleFeatures = [
   'word_count',
@@ -15,7 +16,7 @@ export default function TextDetailPanel({ sample, neighbors, onNeighborClick, lo
   return (
     <section className="panel detail-panel">
       <div className="panel-title">
-        <h2>Text Detail</h2>
+        <h2>Text Detail <InfoTip text="Full text and writing features for the selected sample. Shows 8 nearest neighbors by feature-space distance — click any to navigate to it." align="center" /></h2>
         {loading && <span>Loading...</span>}
       </div>
       {!sample ? (

@@ -1,5 +1,6 @@
 import React from 'react'
 import Plot from 'react-plotly.js'
+import InfoTip from './InfoTip'
 
 const comparisonFeatures = [
   'avg_sentence_length',
@@ -17,7 +18,7 @@ export default function ModelComparisonView({ modelSummary, onModelClick }) {
   return (
     <section className="panel wide-panel">
       <div className="panel-title">
-        <h2>Model Comparison</h2>
+        <h2>Model Comparison <InfoTip text="Average normalized feature profile per model as z-scores. Bars above 0 mean the model scores higher than average on that feature. Click a bar to select that model on the map." /></h2>
         <span>Average normalized feature profiles</span>
       </div>
       <Plot
